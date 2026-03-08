@@ -339,7 +339,9 @@ if (maze[realExit.y][realExit.x] === 1) {
                 break;
             }
         }
-    setCarrots();
+    }
+}
+setCarrots();
 drawMaze();
 document.getElementById('score').textContent = 'Score: ' + score;
 wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds
