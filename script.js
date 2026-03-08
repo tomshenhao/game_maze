@@ -171,11 +171,11 @@ document.getElementById('nextLevel').addEventListener('click', () => {
     generateMaze();
     player = { x: 0, y: 0 };
     drawMaze();
-    wolfInterval = setInterval(moveWolf, 1000);
+    wolfInterval = setInterval(moveWolf, 750);
 });
 
 // Initial setup
 setDimensions();
 generateMaze();
 drawMaze();
-wolfInterval = setInterval(moveWolf, 1000); // wolf moves every 1 second
+wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds

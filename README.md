@@ -1,28 +1,31 @@
-# Maze Game
+# Rabbit Maze Adventure
 
-A simple maze game where you navigate from the entry (red square) to the exit (green square) using mouse clicks to move to adjacent cells.
+Help the cute rabbit 🐰 navigate through the forest 🌳 to reach its home 🏠 before the wolf 🐺 catches it!
 
 ## How to Play
+- **🐰 Rabbit**: Drag with left mouse button to move through open paths
+- **🐺 Wolf**: Automatically chases the rabbit every second
+- **🏠 Home**: Reach the home at bottom-right to win the level
+- **🌳 Trees**: Block your path - find another way!
+- **Goal**: Escape the wolf and reach home safely
 
-- Click on adjacent cells to move the red player.
-- Avoid black walls.
-- Reach the green exit to win the level.
-- Click "Next Level" to proceed to a new maze.
+## Features
+- Progressive difficulty with larger mazes each level
+- Smooth drag-to-move controls
+- Chase mechanic adds excitement and urgency
+- Cute emoji graphics with forest theme
 
-## Deployment
-
-This is a static web game, deployable on Vercel or any static hosting service.
-
-1. Push the code to a Git repository (e.g., GitHub).
-2. Connect the repository to Vercel.
-3. Deploy.
+## Controls
+- Hold left mouse button and drag to move the rabbit
+- Navigate through horizontal/vertical corridors
+- Avoid the wolf's pursuit!
 
 ## Local Development
-
 Run a local server:
-
 ```bash
 python -m http.server 8000
 ```
-
 Then open http://localhost:8000 in your browser.
+
+## Deployment
+Static web game, ready for Vercel or any hosting service.
