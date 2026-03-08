@@ -225,7 +225,39 @@ canvas.addEventListener('mousemove', (e) => {
     }
 });
 
-canvas.addEventListener('mouseup', () => {
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    dragging = true;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = Math.floor((touch.clientX - rect.left) / cellSize);
+    const y = Math.floor((touch.clientY - rect.top) / cellSize);
+    if (canMoveTo(x, y)) {
+        player.x = x;
+        player.y = y;
+        drawMaze();
+        checkWin();
+    }
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (dragging) {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = Math.floor((touch.clientX - rect.left) / cellSize);
+        const y = Math.floor((touch.clientY - rect.top) / cellSize);
+        if (canMoveTo(x, y)) {
+            player.x = x;
+            player.y = y;
+            drawMaze();
+            checkWin();
+        }
+    }
+});
+
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
     dragging = false;
 });
 
