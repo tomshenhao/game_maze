@@ -273,6 +273,31 @@ if (maze[realExit.y][realExit.x] === 1) {
         }
     }
 }
+if (maze[wolf.y][wolf.x] === 1) {
+    maze[wolf.y][wolf.x] = 0;
+    // Connect to adjacent path
+    const adj = [
+        {x: wolf.x, y: wolf.y-1},
+        {x: wolf.x+1, y: wolf.y},
+        {x: wolf.x, y: wolf.y+1},
+        {x: wolf.x-1, y: wolf.y}
+    ];
+    let connected = false;
+    for (let a of adj) {
+        if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows && maze[a.y][a.x] === 0) {
+            connected = true;
+            break;
+        }
+    }
+    if (!connected) {
+        for (let a of adj) {
+            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows) {
+                maze[a.y][a.x] = 0;
+                break;
+            }
+        }
+    }
+}
 setCarrots();
 drawMaze();
 document.getElementById('score').textContent = 'Score: ' + score;
