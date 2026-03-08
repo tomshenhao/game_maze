@@ -70,6 +70,7 @@ function generateMaze() {
 }
 
 function drawMaze() {
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // Draw exit (house)
     ctx.fillStyle = 'green';
@@ -253,30 +254,6 @@ document.getElementById('nextLevel').addEventListener('click', () => {
     clearInterval(wolfInterval);
     setDimensions();
     generateMaze();
-    if (maze[realExit.y][realExit.x] === 1) {
-        maze[realExit.y][realExit.x] = 0;
-        // Connect to adjacent path
-        const adj = [
-            {x: realExit.x, y: realExit.y-1},
-            {x: realExit.x+1, y: realExit.y},
-            {x: realExit.x, y: realExit.y+1},
-            {x: realExit.x-1, y: realExit.y}
-        ];
-        let connected = false;
-        for (let a of adj) {
-            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows && maze[a.y][a.x] === 0) {
-                connected = true;
-                break;
-            }
-        }
-        if (!connected) {
-            for (let a of adj) {
-                if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows) {
-                maze[a.y][a.x] = 0;
-                break;
-            }
-        }
-    }
     setCarrots();
     player = { x: 0, y: 0 };
     drawMaze();
@@ -309,8 +286,6 @@ if (maze[realExit.y][realExit.x] === 1) {
                 break;
             }
         }
-    }
-}
-setCarrots();
+    setCarrots();
 drawMaze();
 wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds
