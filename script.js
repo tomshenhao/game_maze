@@ -156,22 +156,15 @@ function checkWin() {
 function canMoveTo(tx, ty) {
     if (tx < 0 || tx >= cols || ty < 0 || ty >= rows || maze[ty][tx] === 1) return false;
     if (tx === player.x && ty === player.y) return false; // already there
-    if (tx === player.x) { // same column, vertical move
-        const start = Math.min(player.y, ty);
-        const end = Math.max(player.y, ty);
-        for (let i = start; i <= end; i++) {
-            if (maze[i][tx] === 1 || (tx === wolf.x && i === wolf.y)) return false;
-        }
-        return true;
-    } else if (ty === player.y) { // same row, horizontal move
-        const start = Math.min(player.x, tx);
-        const end = Math.max(player.x, tx);
-        for (let i = start; i <= end; i++) {
-            if (maze[ty][i] === 1 || (i === wolf.x && ty === wolf.y)) return false;
-        }
+    // Only allow adjacent moves (up, down, left, right)
+    const dx = Math.abs(tx - player.x);
+    const dy = Math.abs(ty - player.y);
+    if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+        // Adjacent cell, check if wolf is there
+        if (tx === wolf.x && ty === wolf.y) return false;
         return true;
     }
-    return false; // diagonal not allowed for drag
+    return false; // not adjacent
 }
 
 let wolfInterval;
