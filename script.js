@@ -115,16 +115,48 @@ function canMoveTo(tx, ty) {
 
 let wolfInterval;
 
+function getNextWolfMove() {
+    // Simple BFS to find next step towards player
+    const queue = [{ x: wolf.x, y: wolf.y, path: [] }];
+    const visited = new Set();
+    visited.add(`${wolf.x},${wolf.y}`);
+    
+    const directions = [
+        { x: 0, y: -1 }, // up
+        { x: 1, y: 0 },  // right
+        { x: 0, y: 1 },  // down
+        { x: -1, y: 0 }  // left
+    ];
+    
+    while (queue.length > 0) {
+        const current = queue.shift();
+        
+        // Check if reached player
+        if (current.x === player.x && current.y === player.y) {
+            // Return the first step
+            if (current.path.length > 0) {
+                return current.path[0];
+            }
+            return null; // already at player
+        }
+        
+        for (let dir of directions) {
+            const nx = current.x + dir.x;
+            const ny = current.y + dir.y;
+            if (nx >= 0 && nx < cols && ny >= 0 && ny < rows && maze[ny][nx] === 0 && !visited.has(`${nx},${ny}`)) {
+                visited.add(`${nx},${ny}`);
+                queue.push({ x: nx, y: ny, path: [...current.path, { x: nx, y: ny }] });
+            }
+        }
+    }
+    return null; // no path
+}
+
 function moveWolf() {
-    // Move wolf towards player
-    if (wolf.x < player.x && wolf.x + 1 < cols && maze[wolf.y][wolf.x + 1] === 0) {
-        wolf.x++;
-    } else if (wolf.x > player.x && wolf.x - 1 >= 0 && maze[wolf.y][wolf.x - 1] === 0) {
-        wolf.x--;
-    } else if (wolf.y < player.y && wolf.y + 1 < rows && maze[wolf.y + 1][wolf.x] === 0) {
-        wolf.y++;
-    } else if (wolf.y > player.y && wolf.y - 1 >= 0 && maze[wolf.y - 1][wolf.x] === 0) {
-        wolf.y--;
+    const nextMove = getNextWolfMove();
+    if (nextMove) {
+        wolf.x = nextMove.x;
+        wolf.y = nextMove.y;
     }
     drawMaze();
     checkWin();
