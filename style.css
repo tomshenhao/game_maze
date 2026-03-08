@@ -21,7 +21,7 @@ body {
 #mazeContainer td {
     text-align: center;
     vertical-align: middle;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 #level {

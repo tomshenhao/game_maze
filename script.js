@@ -39,9 +39,9 @@ let dragging = false;
 let score = 0;
 
 function setDimensions() {
-    cols = 19 + level * 2; // start with 21x21, increase by 2 each level (even bigger mazes)
+    cols = 15 + level * 2; // start with 17x17, increase by 2 each level
     rows = cols;
-    cellSize = 30; // larger cells for emojis
+    cellSize = 25; // good size for emojis
     realExit = { x: Math.floor(cols / 2), y: Math.floor(rows / 2) }; // center of maze
     wolf = { x: cols - 1, y: rows - 1 }; // wolf starts at bottom-right
     initMazeDisplay();
@@ -280,6 +280,7 @@ wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds
 
 // Add event listeners after maze is initialized
 mazeContainer.addEventListener('mousedown', (e) => {
+    e.preventDefault(); // prevent text selection
     dragging = true;
     if (e.target.tagName === 'TD') {
         let td = e.target;
@@ -297,6 +298,7 @@ mazeContainer.addEventListener('mousedown', (e) => {
 });
 
 mazeContainer.addEventListener('mousemove', (e) => {
+    e.preventDefault(); // prevent text selection
     if (dragging && e.target.tagName === 'TD') {
         let td = e.target;
         let tr = td.parentElement;
