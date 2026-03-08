@@ -1,12 +1,17 @@
 const canvas = document.getElementById('mazeCanvas');
 const ctx = canvas.getContext('2d');
-const cellSize = 20;
-const cols = Math.floor(canvas.width / cellSize);
-const rows = Math.floor(canvas.height / cellSize);
 let level = 1;
 let maze = [];
 let player = { x: 0, y: 0 };
-let exit = { x: cols - 1, y: rows - 1 };
+let exit = { x: 0, y: 0 };
+let cols, rows, cellSize;
+
+function setDimensions() {
+    cols = 8 + level * 2; // start with 10x10, increase by 2 each level
+    rows = cols;
+    cellSize = Math.floor(canvas.width / cols);
+    exit = { x: cols - 1, y: rows - 1 };
+}
 
 const directions = [
     { x: 0, y: -1 }, // up
@@ -82,11 +87,13 @@ document.getElementById('nextLevel').addEventListener('click', () => {
     document.getElementById('level').textContent = 'Level: ' + level;
     document.getElementById('message').textContent = '';
     document.getElementById('nextLevel').style.display = 'none';
+    setDimensions();
     generateMaze();
     player = { x: 0, y: 0 };
     drawMaze();
 });
 
 // Initial setup
+setDimensions();
 generateMaze();
 drawMaze();
