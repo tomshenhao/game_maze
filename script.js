@@ -39,7 +39,7 @@ let dragging = false;
 let score = 0;
 
 function setDimensions() {
-    cols = 15 + level * 2; // start with 17x17, increase by 2 each level
+    cols = 13 + level * 2; // start with 15x15, increase by 2 each level
     rows = cols;
     cellSize = 25; // good size for emojis
     realExit = { x: Math.floor(cols / 2), y: Math.floor(rows / 2) }; // center of maze
