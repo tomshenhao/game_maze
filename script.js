@@ -275,7 +275,7 @@ if (maze[realExit.y][realExit.x] === 1) {
 }
 if (maze[wolf.y][wolf.x] === 1) {
     maze[wolf.y][wolf.x] = 0;
-    // Connect to adjacent path
+    // Connect to adjacent path by finding a wall adjacent to a path
     const adj = [
         {x: wolf.x, y: wolf.y-1},
         {x: wolf.x+1, y: wolf.y},
@@ -290,10 +290,24 @@ if (maze[wolf.y][wolf.x] === 1) {
         }
     }
     if (!connected) {
+        // Find a wall adjacent that has a neighbor that is path
         for (let a of adj) {
-            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows) {
-                maze[a.y][a.x] = 0;
-                break;
+            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows && maze[a.y][a.x] === 1) {
+                // Check if this wall has a neighbor that is path
+                const neighbors = [
+                    {x: a.x, y: a.y-1},
+                    {x: a.x+1, y: a.y},
+                    {x: a.x, y: a.y+1},
+                    {x: a.x-1, y: a.y}
+                ];
+                for (let n of neighbors) {
+                    if (n.x >= 0 && n.x < cols && n.y >= 0 && n.y < rows && maze[n.y][n.x] === 0) {
+                        maze[a.y][a.x] = 0;
+                        connected = true;
+                        break;
+                    }
+                }
+                if (connected) break;
             }
         }
     }
