@@ -4,7 +4,7 @@ let level = 1;
 let maze = [];
 let player = { x: 0, y: 0 };
 let realExit = { x: 0, y: 0 };
-let falseExits = [];
+let wolf = { x: 0, y: 0 };
 let cols, rows, cellSize;
 
 function setDimensions() {
@@ -12,22 +12,7 @@ function setDimensions() {
     rows = cols;
     cellSize = Math.floor(canvas.width / cols);
     realExit = { x: cols - 1, y: rows - 1 };
-}
-
-function setFalseExits() {
-    falseExits = [];
-    // Add 2-3 false exits depending on level
-    const numFalse = Math.min(3, Math.floor(level / 2) + 1);
-    for (let i = 0; i < numFalse; i++) {
-        let fx, fy;
-        let attempts = 0;
-        do {
-            fx = Math.floor(Math.random() * cols);
-            fy = Math.floor(Math.random() * rows);
-            attempts++;
-        } while (attempts < 50 && (maze[fy][fx] === 1 || (fx === 0 && fy === 0) || (fx === realExit.x && fy === realExit.y) || falseExits.some(f => f.x === fx && f.y === fy)));
-        if (attempts < 50) falseExits.push({ x: fx, y: fy });
-    }
+    wolf = { x: cols - 1, y: 0 }; // wolf starts at top-right
 }
 
 const directions = [
@@ -83,33 +68,28 @@ function drawMaze() {
             }
         }
     }
-    // Draw exits (homes)
+    // Draw exit (home)
     ctx.fillText('🏠', realExit.x * cellSize + cellSize / 2, realExit.y * cellSize + cellSize / 2);
-    for (let f of falseExits) {
-        ctx.fillText('🏠', f.x * cellSize + cellSize / 2, f.y * cellSize + cellSize / 2);
-    }
     // Draw player (rabbit)
     ctx.fillText('🐰', player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2);
+    // Draw wolf
+    ctx.fillText('🐺', wolf.x * cellSize + cellSize / 2, wolf.y * cellSize + cellSize / 2);
 }
 
 function checkWin() {
     if (player.x === realExit.x && player.y === realExit.y) {
-        document.getElementById('message').textContent = '🐰 Rabbit reached the real home! 🏠';
+        document.getElementById('message').textContent = '🐰 Rabbit reached home safely! 🏠';
         document.getElementById('nextLevel').style.display = 'block';
-    } else {
-        for (let f of falseExits) {
-            if (player.x === f.x && player.y === f.y) {
-                document.getElementById('message').textContent = 'Wrong home! Find the real one!';
-                setTimeout(() => {
-                    player = { x: 0, y: 0 };
-                    drawMaze();
-                    document.getElementById('message').textContent = '';
-                }, 2000);
-                return true; // blocked
-            }
-        }
+        clearInterval(wolfInterval); // stop wolf movement
+    } else if (player.x === wolf.x && player.y === wolf.y) {
+        document.getElementById('message').textContent = '🐺 Wolf caught the rabbit! Try again!';
+        setTimeout(() => {
+            player = { x: 0, y: 0 };
+            wolf = { x: cols - 1, y: 0 };
+            drawMaze();
+            document.getElementById('message').textContent = '';
+        }, 2000);
     }
-    return false;
 }
 
 function canMoveTo(tx, ty) {
@@ -131,6 +111,23 @@ function canMoveTo(tx, ty) {
         return true;
     }
     return false; // diagonal not allowed for drag
+}
+
+let wolfInterval;
+
+function moveWolf() {
+    // Move wolf towards player
+    if (wolf.x < player.x && wolf.x + 1 < cols && maze[wolf.y][wolf.x + 1] === 0) {
+        wolf.x++;
+    } else if (wolf.x > player.x && wolf.x - 1 >= 0 && maze[wolf.y][wolf.x - 1] === 0) {
+        wolf.x--;
+    } else if (wolf.y < player.y && wolf.y + 1 < rows && maze[wolf.y + 1][wolf.x] === 0) {
+        wolf.y++;
+    } else if (wolf.y > player.y && wolf.y - 1 >= 0 && maze[wolf.y - 1][wolf.x] === 0) {
+        wolf.y--;
+    }
+    drawMaze();
+    checkWin();
 }
 
 canvas.addEventListener('mousedown', (e) => {
@@ -169,15 +166,16 @@ document.getElementById('nextLevel').addEventListener('click', () => {
     document.getElementById('level').textContent = 'Level: ' + level;
     document.getElementById('message').textContent = '';
     document.getElementById('nextLevel').style.display = 'none';
+    clearInterval(wolfInterval);
     setDimensions();
     generateMaze();
-    setFalseExits();
     player = { x: 0, y: 0 };
     drawMaze();
+    wolfInterval = setInterval(moveWolf, 1000);
 });
 
 // Initial setup
 setDimensions();
 generateMaze();
-setFalseExits();
 drawMaze();
+wolfInterval = setInterval(moveWolf, 1000); // wolf moves every 1 second
