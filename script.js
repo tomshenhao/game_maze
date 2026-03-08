@@ -222,6 +222,54 @@ function moveWolf() {
     }
 }
 
+document.getElementById('nextLevel').addEventListener('click', () => {
+    level++;
+    document.getElementById('level').textContent = 'Level: ' + level;
+    document.getElementById('message').textContent = '';
+    document.getElementById('nextLevel').style.display = 'none';
+    clearInterval(wolfInterval);
+    setDimensions();
+    generateMaze();
+    setCarrots();
+    player = { x: 0, y: 0 };
+    drawMaze();
+    wolfInterval = setInterval(moveWolf, 750);
+});
+
+// Initial setup
+setDimensions();
+generateMaze();
+if (maze[realExit.y][realExit.x] === 1) {
+    maze[realExit.y][realExit.x] = 0;
+    // Connect to adjacent path
+    const adj = [
+        {x: realExit.x, y: realExit.y-1},
+        {x: realExit.x+1, y: realExit.y},
+        {x: realExit.x, y: realExit.y+1},
+        {x: realExit.x-1, y: realExit.y}
+    ];
+    let connected = false;
+    for (let a of adj) {
+        if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows && maze[a.y][a.x] === 0) {
+            connected = true;
+            break;
+        }
+    }
+    if (!connected) {
+        for (let a of adj) {
+            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows) {
+                maze[a.y][a.x] = 0;
+                break;
+            }
+        }
+    }
+}
+setCarrots();
+drawMaze();
+document.getElementById('score').textContent = 'Score: ' + score;
+wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds
+
+// Add event listeners after maze is initialized
 mazeContainer.addEventListener('mousedown', (e) => {
     dragging = true;
     if (e.target.tagName === 'TD') {
@@ -298,50 +346,3 @@ mazeContainer.addEventListener('touchend', (e) => {
     e.preventDefault();
     dragging = false;
 });
-
-document.getElementById('nextLevel').addEventListener('click', () => {
-    level++;
-    document.getElementById('level').textContent = 'Level: ' + level;
-    document.getElementById('message').textContent = '';
-    document.getElementById('nextLevel').style.display = 'none';
-    clearInterval(wolfInterval);
-    setDimensions();
-    generateMaze();
-    setCarrots();
-    player = { x: 0, y: 0 };
-    drawMaze();
-    wolfInterval = setInterval(moveWolf, 750);
-});
-
-// Initial setup
-setDimensions();
-generateMaze();
-if (maze[realExit.y][realExit.x] === 1) {
-    maze[realExit.y][realExit.x] = 0;
-    // Connect to adjacent path
-    const adj = [
-        {x: realExit.x, y: realExit.y-1},
-        {x: realExit.x+1, y: realExit.y},
-        {x: realExit.x, y: realExit.y+1},
-        {x: realExit.x-1, y: realExit.y}
-    ];
-    let connected = false;
-    for (let a of adj) {
-        if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows && maze[a.y][a.x] === 0) {
-            connected = true;
-            break;
-        }
-    }
-    if (!connected) {
-        for (let a of adj) {
-            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows) {
-                maze[a.y][a.x] = 0;
-                break;
-            }
-        }
-    }
-}
-setCarrots();
-drawMaze();
-document.getElementById('score').textContent = 'Score: ' + score;
-wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds
