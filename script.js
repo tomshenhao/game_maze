@@ -14,6 +14,9 @@ function setDimensions() {
     cellSize = Math.floor(canvas.width / cols);
     realExit = { x: cols - 1, y: rows - 1 };
     wolf = { x: cols - 1, y: 0 }; // wolf starts at top-right
+}
+
+function setCarrots() {
     carrots = [];
     // Add 2-3 carrots depending on level
     const numCarrots = Math.min(4, 2 + Math.floor(level / 2));
@@ -234,6 +237,7 @@ document.getElementById('nextLevel').addEventListener('click', () => {
     clearInterval(wolfInterval);
     setDimensions();
     generateMaze();
+    setCarrots();
     player = { x: 0, y: 0 };
     drawMaze();
     wolfInterval = setInterval(moveWolf, 750);
@@ -242,5 +246,6 @@ document.getElementById('nextLevel').addEventListener('click', () => {
 // Initial setup
 setDimensions();
 generateMaze();
+setCarrots();
 drawMaze();
 wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds
