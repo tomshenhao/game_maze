@@ -99,14 +99,14 @@ function canMoveTo(tx, ty) {
         const start = Math.min(player.y, ty);
         const end = Math.max(player.y, ty);
         for (let i = start; i <= end; i++) {
-            if (maze[i][tx] === 1) return false;
+            if (maze[i][tx] === 1 || (tx === wolf.x && i === wolf.y)) return false;
         }
         return true;
     } else if (ty === player.y) { // same row, horizontal move
         const start = Math.min(player.x, tx);
         const end = Math.max(player.x, tx);
         for (let i = start; i <= end; i++) {
-            if (maze[ty][i] === 1) return false;
+            if (maze[ty][i] === 1 || (i === wolf.x && ty === wolf.y)) return false;
         }
         return true;
     }
