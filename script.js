@@ -66,12 +66,35 @@ function drawMaze() {
     ctx.fillRect(exit.x * cellSize, exit.y * cellSize, cellSize, cellSize);
 }
 
-canvas.addEventListener('click', (e) => {
+let dragging = false;
+
+function canMoveTo(tx, ty) {
+    if (tx < 0 || tx >= cols || ty < 0 || ty >= rows || maze[ty][tx] === 1) return false;
+    if (tx === player.x && ty === player.y) return false; // already there
+    if (tx === player.x) { // same column, vertical move
+        const start = Math.min(player.y, ty);
+        const end = Math.max(player.y, ty);
+        for (let i = start; i <= end; i++) {
+            if (maze[i][tx] === 1) return false;
+        }
+        return true;
+    } else if (ty === player.y) { // same row, horizontal move
+        const start = Math.min(player.x, tx);
+        const end = Math.max(player.x, tx);
+        for (let i = start; i <= end; i++) {
+            if (maze[ty][i] === 1) return false;
+        }
+        return true;
+    }
+    return false; // diagonal not allowed for drag
+}
+
+canvas.addEventListener('mousedown', (e) => {
+    dragging = true;
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / cellSize);
     const y = Math.floor((e.clientY - rect.top) / cellSize);
-    // Move to adjacent cell if possible
-    if (Math.abs(x - player.x) + Math.abs(y - player.y) === 1 && maze[y][x] === 0) {
+    if (canMoveTo(x, y)) {
         player.x = x;
         player.y = y;
         drawMaze();
@@ -80,6 +103,27 @@ canvas.addEventListener('click', (e) => {
             document.getElementById('nextLevel').style.display = 'block';
         }
     }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    if (dragging) {
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / cellSize);
+        const y = Math.floor((e.clientY - rect.top) / cellSize);
+        if (canMoveTo(x, y)) {
+            player.x = x;
+            player.y = y;
+            drawMaze();
+            if (player.x === exit.x && player.y === exit.y) {
+                document.getElementById('message').textContent = 'You win!';
+                document.getElementById('nextLevel').style.display = 'block';
+            }
+        }
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    dragging = false;
 });
 
 document.getElementById('nextLevel').addEventListener('click', () => {
