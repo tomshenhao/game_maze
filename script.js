@@ -7,7 +7,7 @@ let exit = { x: 0, y: 0 };
 let cols, rows, cellSize;
 
 function setDimensions() {
-    cols = 8 + level * 2; // start with 10x10, increase by 2 each level
+    cols = 7 + level * 2; // start with 9x9, increase by 2 each level (odd numbers)
     rows = cols;
     cellSize = Math.floor(canvas.width / cols);
     exit = { x: cols - 1, y: rows - 1 };
