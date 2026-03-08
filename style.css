@@ -18,6 +18,12 @@ body {
     cursor: pointer;
 }
 
+#mazeContainer td {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 20px;
+}
+
 #level {
     margin-top: 10px;
     font-size: 24px;

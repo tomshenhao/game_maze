@@ -41,7 +41,7 @@ let score = 0;
 function setDimensions() {
     cols = 19 + level * 2; // start with 21x21, increase by 2 each level (even bigger mazes)
     rows = cols;
-    cellSize = 20; // fixed cell size for table
+    cellSize = 30; // larger cells for emojis
     realExit = { x: Math.floor(cols / 2), y: Math.floor(rows / 2) }; // center of maze
     wolf = { x: cols - 1, y: rows - 1 }; // wolf starts at bottom-right
     initMazeDisplay();
@@ -69,6 +69,13 @@ const directions = [
     { x: 0, y: 1 },  // down
     { x: -1, y: 0 }  // left
 ];
+
+const WALL = '🌳';
+const PATH = '';
+const RABBIT = '🐰';
+const WOLF = '🐺';
+const HOUSE = '🏠';
+const CARROT = '🥕';
 
 function generateMaze() {
     maze = Array(rows).fill().map(() => Array(cols).fill(1)); // all walls
@@ -102,22 +109,24 @@ function drawMaze() {
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             if (maze[i][j] === 1) {
-                cells[i][j].style.backgroundColor = '#000';
+                cells[i][j].innerHTML = WALL;
+                cells[i][j].style.backgroundColor = '#90EE90'; // light green for grass background
             } else {
-                cells[i][j].style.backgroundColor = '#fff';
+                cells[i][j].innerHTML = PATH;
+                cells[i][j].style.backgroundColor = '#90EE90'; // light green for grass background
             }
         }
     }
     // Draw exit (house)
-    cells[realExit.y][realExit.x].style.backgroundColor = 'green';
+    cells[realExit.y][realExit.x].innerHTML = HOUSE;
     // Draw carrots
     for (let c of carrots) {
-        cells[c.y][c.x].style.backgroundColor = 'orange';
+        cells[c.y][c.x].innerHTML = CARROT;
     }
     // Draw player (rabbit)
-    cells[player.y][player.x].style.backgroundColor = 'red';
+    cells[player.y][player.x].innerHTML = RABBIT;
     // Draw wolf
-    cells[wolf.y][wolf.x].style.backgroundColor = 'blue';
+    cells[wolf.y][wolf.x].innerHTML = WOLF;
 }
 
 function checkWin() {
