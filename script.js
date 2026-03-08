@@ -99,7 +99,7 @@ function drawMaze() {
 
 function checkWin() {
     if (player.x === realExit.x && player.y === realExit.y) {
-        document.getElementById('message').textContent = '🐰 Rabbit reached home safely! 🏠';
+        document.getElementById('message').textContent = '🐰 Rabbit reached home first! 🏠';
         document.getElementById('nextLevel').style.display = 'block';
         clearInterval(wolfInterval); // stop wolf movement
     } else {
@@ -115,15 +115,6 @@ function checkWin() {
                 drawMaze();
                 return;
             }
-        }
-        if (player.x === wolf.x && player.y === wolf.y) {
-            document.getElementById('message').textContent = '🐺 Wolf caught the rabbit! Try again!';
-            setTimeout(() => {
-                player = { x: 0, y: 0 };
-                wolf = { x: cols - 1, y: rows - 1 };
-                drawMaze();
-                document.getElementById('message').textContent = '';
-            }, 2000);
         }
     }
 }
@@ -152,7 +143,7 @@ function canMoveTo(tx, ty) {
 let wolfInterval;
 
 function getNextWolfMove() {
-    // Simple BFS to find next step towards player
+    // Simple BFS to find next step towards the house
     const queue = [{ x: wolf.x, y: wolf.y, path: [] }];
     const visited = new Set();
     visited.add(`${wolf.x},${wolf.y}`);
@@ -167,13 +158,13 @@ function getNextWolfMove() {
     while (queue.length > 0) {
         const current = queue.shift();
         
-        // Check if reached player
-        if (current.x === player.x && current.y === player.y) {
+        // Check if reached house
+        if (current.x === realExit.x && current.y === realExit.y) {
             // Return the first step
             if (current.path.length > 0) {
                 return current.path[0];
             }
-            return null; // already at player
+            return null; // already at house
         }
         
         for (let dir of directions) {
@@ -195,7 +186,15 @@ function moveWolf() {
         wolf.y = nextMove.y;
     }
     drawMaze();
-    checkWin();
+    if (wolf.x === realExit.x && wolf.y === realExit.y) {
+        document.getElementById('message').textContent = '🐺 Wolf reached home first! Try again!';
+        setTimeout(() => {
+            player = { x: 0, y: 0 };
+            wolf = { x: cols - 1, y: rows - 1 };
+            drawMaze();
+            document.getElementById('message').textContent = '';
+        }, 2000);
+    }
 }
 
 canvas.addEventListener('mousedown', (e) => {
