@@ -3,14 +3,28 @@ const ctx = canvas.getContext('2d');
 let level = 1;
 let maze = [];
 let player = { x: 0, y: 0 };
-let exit = { x: 0, y: 0 };
+let realExit = { x: 0, y: 0 };
+let falseExits = [];
 let cols, rows, cellSize;
 
 function setDimensions() {
     cols = 13 + level * 2; // start with 15x15, increase by 2 each level (bigger and harder)
     rows = cols;
     cellSize = Math.floor(canvas.width / cols);
-    exit = { x: cols - 1, y: rows - 1 };
+    realExit = { x: cols - 1, y: rows - 1 };
+    falseExits = [];
+    // Add 2-3 false exits depending on level
+    const numFalse = Math.min(3, Math.floor(level / 2) + 1);
+    for (let i = 0; i < numFalse; i++) {
+        let fx, fy;
+        let attempts = 0;
+        do {
+            fx = Math.floor(Math.random() * cols);
+            fy = Math.floor(Math.random() * rows);
+            attempts++;
+        } while (attempts < 50 && (maze[fy][fx] === 1 || (fx === 0 && fy === 0) || (fx === realExit.x && fy === realExit.y) || falseExits.some(f => f.x === fx && f.y === fy)));
+        if (attempts < 50) falseExits.push({ x: fx, y: fy });
+    }
 }
 
 const directions = [
@@ -66,13 +80,34 @@ function drawMaze() {
             }
         }
     }
-    // Draw exit (home)
-    ctx.fillText('🏠', exit.x * cellSize + cellSize / 2, exit.y * cellSize + cellSize / 2);
+    // Draw exits (homes)
+    ctx.fillText('🏠', realExit.x * cellSize + cellSize / 2, realExit.y * cellSize + cellSize / 2);
+    for (let f of falseExits) {
+        ctx.fillText('🏠', f.x * cellSize + cellSize / 2, f.y * cellSize + cellSize / 2);
+    }
     // Draw player (rabbit)
     ctx.fillText('🐰', player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2);
 }
 
-let dragging = false;
+function checkWin() {
+    if (player.x === realExit.x && player.y === realExit.y) {
+        document.getElementById('message').textContent = '🐰 Rabbit reached the real home! 🏠';
+        document.getElementById('nextLevel').style.display = 'block';
+    } else {
+        for (let f of falseExits) {
+            if (player.x === f.x && player.y === f.y) {
+                document.getElementById('message').textContent = 'Wrong home! Find the real one!';
+                setTimeout(() => {
+                    player = { x: 0, y: 0 };
+                    drawMaze();
+                    document.getElementById('message').textContent = '';
+                }, 2000);
+                return true; // blocked
+            }
+        }
+    }
+    return false;
+}
 
 function canMoveTo(tx, ty) {
     if (tx < 0 || tx >= cols || ty < 0 || ty >= rows || maze[ty][tx] === 1) return false;
@@ -104,10 +139,7 @@ canvas.addEventListener('mousedown', (e) => {
         player.x = x;
         player.y = y;
         drawMaze();
-        if (player.x === exit.x && player.y === exit.y) {
-            document.getElementById('message').textContent = '🐰 Rabbit reached home! 🏠';
-            document.getElementById('nextLevel').style.display = 'block';
-        }
+        checkWin();
     }
 });
 
@@ -120,10 +152,7 @@ canvas.addEventListener('mousemove', (e) => {
             player.x = x;
             player.y = y;
             drawMaze();
-            if (player.x === exit.x && player.y === exit.y) {
-                document.getElementById('message').textContent = '🐰 Rabbit reached home! 🏠';
-                document.getElementById('nextLevel').style.display = 'block';
-            }
+            checkWin();
         }
     }
 });
