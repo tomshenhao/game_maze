@@ -68,38 +68,34 @@ function generateMaze() {
 }
 
 function drawMaze() {
-    // Draw grass background
-    ctx.fillStyle = '#90EE90'; // light green
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Set font for emojis
-    ctx.font = `${cellSize * 0.8}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             if (maze[i][j] === 1) {
-                // Draw tree wall
-                ctx.fillText('🌳', j * cellSize + cellSize / 2, i * cellSize + cellSize / 2);
+                ctx.fillStyle = '#000';
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             }
         }
     }
-    // Draw exit (home)
-    ctx.fillText('🏠', realExit.x * cellSize + cellSize / 2, realExit.y * cellSize + cellSize / 2);
+    // Draw exit (house)
+    ctx.fillStyle = 'green';
+    ctx.fillRect(realExit.x * cellSize, realExit.y * cellSize, cellSize, cellSize);
     // Draw carrots
+    ctx.fillStyle = 'orange';
     for (let c of carrots) {
-        ctx.fillText('🥕', c.x * cellSize + cellSize / 2, c.y * cellSize + cellSize / 2);
+        ctx.fillRect(c.x * cellSize, c.y * cellSize, cellSize, cellSize);
     }
     // Draw player (rabbit)
-    ctx.fillText('🐰', player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2);
+    ctx.fillStyle = 'red';
+    ctx.fillRect(player.x * cellSize, player.y * cellSize, cellSize, cellSize);
     // Draw wolf
-    ctx.fillText('🐺', wolf.x * cellSize + cellSize / 2, wolf.y * cellSize + cellSize / 2);
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(wolf.x * cellSize, wolf.y * cellSize, cellSize, cellSize);
 }
 
 function checkWin() {
     if (player.x === realExit.x && player.y === realExit.y) {
-        document.getElementById('message').textContent = '🐰 Rabbit reached home first! 🏠';
+        document.getElementById('message').textContent = 'Rabbit reached home first!';
         document.getElementById('nextLevel').style.display = 'block';
         clearInterval(wolfInterval); // stop wolf movement
     } else {
@@ -108,7 +104,7 @@ function checkWin() {
             if (player.x === carrots[i].x && player.y === carrots[i].y) {
                 carrots.splice(i, 1); // remove carrot
                 wolf = { x: cols - 1, y: rows - 1 }; // reset wolf
-                document.getElementById('message').textContent = '🥕 Yummy carrot! Wolf sent back! 🐺➡️🏠';
+                document.getElementById('message').textContent = 'Yummy carrot! Wolf sent back!';
                 setTimeout(() => {
                     document.getElementById('message').textContent = '';
                 }, 2000);
@@ -187,7 +183,7 @@ function moveWolf() {
     }
     drawMaze();
     if (wolf.x === realExit.x && wolf.y === realExit.y) {
-        document.getElementById('message').textContent = '🐺 Wolf reached home first! Try again!';
+        document.getElementById('message').textContent = 'Wolf reached home first! Try again!';
         setTimeout(() => {
             player = { x: 0, y: 0 };
             wolf = { x: cols - 1, y: rows - 1 };
