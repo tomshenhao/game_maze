@@ -5,6 +5,7 @@ let maze = [];
 let player = { x: 0, y: 0 };
 let realExit = { x: 0, y: 0 };
 let wolf = { x: 0, y: 0 };
+let carrots = [];
 let cols, rows, cellSize;
 
 function setDimensions() {
@@ -13,6 +14,19 @@ function setDimensions() {
     cellSize = Math.floor(canvas.width / cols);
     realExit = { x: cols - 1, y: rows - 1 };
     wolf = { x: cols - 1, y: 0 }; // wolf starts at top-right
+    carrots = [];
+    // Add 2-3 carrots depending on level
+    const numCarrots = Math.min(4, 2 + Math.floor(level / 2));
+    for (let i = 0; i < numCarrots; i++) {
+        let cx, cy;
+        let attempts = 0;
+        do {
+            cx = Math.floor(Math.random() * cols);
+            cy = Math.floor(Math.random() * rows);
+            attempts++;
+        } while (attempts < 50 && (maze[cy][cx] === 1 || (cx === 0 && cy === 0) || (cx === realExit.x && cy === realExit.y) || carrots.some(c => c.x === cx && c.y === cy)));
+        if (attempts < 50) carrots.push({ x: cx, y: cy });
+    }
 }
 
 const directions = [
@@ -70,6 +84,10 @@ function drawMaze() {
     }
     // Draw exit (home)
     ctx.fillText('🏠', realExit.x * cellSize + cellSize / 2, realExit.y * cellSize + cellSize / 2);
+    // Draw carrots
+    for (let c of carrots) {
+        ctx.fillText('🥕', c.x * cellSize + cellSize / 2, c.y * cellSize + cellSize / 2);
+    }
     // Draw player (rabbit)
     ctx.fillText('🐰', player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2);
     // Draw wolf
@@ -81,14 +99,29 @@ function checkWin() {
         document.getElementById('message').textContent = '🐰 Rabbit reached home safely! 🏠';
         document.getElementById('nextLevel').style.display = 'block';
         clearInterval(wolfInterval); // stop wolf movement
-    } else if (player.x === wolf.x && player.y === wolf.y) {
-        document.getElementById('message').textContent = '🐺 Wolf caught the rabbit! Try again!';
-        setTimeout(() => {
-            player = { x: 0, y: 0 };
-            wolf = { x: cols - 1, y: 0 };
-            drawMaze();
-            document.getElementById('message').textContent = '';
-        }, 2000);
+    } else {
+        // Check for carrots
+        for (let i = carrots.length - 1; i >= 0; i--) {
+            if (player.x === carrots[i].x && player.y === carrots[i].y) {
+                carrots.splice(i, 1); // remove carrot
+                wolf = { x: cols - 1, y: 0 }; // reset wolf
+                document.getElementById('message').textContent = '🥕 Yummy carrot! Wolf sent back! 🐺➡️🏠';
+                setTimeout(() => {
+                    document.getElementById('message').textContent = '';
+                }, 2000);
+                drawMaze();
+                return;
+            }
+        }
+        if (player.x === wolf.x && player.y === wolf.y) {
+            document.getElementById('message').textContent = '🐺 Wolf caught the rabbit! Try again!';
+            setTimeout(() => {
+                player = { x: 0, y: 0 };
+                wolf = { x: cols - 1, y: 0 };
+                drawMaze();
+                document.getElementById('message').textContent = '';
+            }, 2000);
+        }
     }
 }
 
