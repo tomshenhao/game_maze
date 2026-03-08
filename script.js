@@ -1,7 +1,13 @@
 const canvas = document.getElementById('mazeCanvas');
-if (!canvas) return;
+if (!canvas) {
+    document.body.innerHTML = '<h1>Canvas not found</h1><p>Unable to find the game canvas element.</p>';
+    return;
+}
 const ctx = canvas.getContext('2d');
-if (!ctx) return;
+if (!ctx) {
+    document.body.innerHTML = '<h1>Canvas not supported</h1><p>Your browser does not support HTML5 Canvas. Please use a modern browser like Chrome, Firefox, or Edge.</p>';
+    return;
+}
 canvas.width = 400;
 canvas.height = 400;
 let level = 1;
