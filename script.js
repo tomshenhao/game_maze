@@ -12,8 +12,8 @@ function setDimensions() {
     cols = 19 + level * 2; // start with 21x21, increase by 2 each level (even bigger mazes)
     rows = cols;
     cellSize = Math.floor(canvas.width / cols);
-    realExit = { x: cols - 1, y: rows - 1 };
-    wolf = { x: cols - 1, y: 0 }; // wolf starts at top-right
+    realExit = { x: Math.floor(cols / 2), y: Math.floor(rows / 2) }; // center of maze
+    wolf = { x: cols - 1, y: rows - 1 }; // wolf starts at bottom-right
 }
 
 function setCarrots() {
@@ -27,7 +27,7 @@ function setCarrots() {
             cx = Math.floor(Math.random() * cols);
             cy = Math.floor(Math.random() * rows);
             attempts++;
-        } while (attempts < 50 && (maze[cy][cx] === 1 || (cx === 0 && cy === 0) || (cx === realExit.x && cy === realExit.y) || carrots.some(c => c.x === cx && c.y === cy)));
+        } while (attempts < 50 && (maze[cy][cx] === 1 || (cx === 0 && cy === 0) || (cx === realExit.x && cy === realExit.y) || (cx === cols - 1 && cy === rows - 1) || carrots.some(c => c.x === cx && c.y === cy)));
         if (attempts < 50) carrots.push({ x: cx, y: cy });
     }
 }
@@ -107,7 +107,7 @@ function checkWin() {
         for (let i = carrots.length - 1; i >= 0; i--) {
             if (player.x === carrots[i].x && player.y === carrots[i].y) {
                 carrots.splice(i, 1); // remove carrot
-                wolf = { x: cols - 1, y: 0 }; // reset wolf
+                wolf = { x: cols - 1, y: rows - 1 }; // reset wolf
                 document.getElementById('message').textContent = '🥕 Yummy carrot! Wolf sent back! 🐺➡️🏠';
                 setTimeout(() => {
                     document.getElementById('message').textContent = '';
@@ -120,7 +120,7 @@ function checkWin() {
             document.getElementById('message').textContent = '🐺 Wolf caught the rabbit! Try again!';
             setTimeout(() => {
                 player = { x: 0, y: 0 };
-                wolf = { x: cols - 1, y: 0 };
+                wolf = { x: cols - 1, y: rows - 1 };
                 drawMaze();
                 document.getElementById('message').textContent = '';
             }, 2000);
