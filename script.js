@@ -12,6 +12,9 @@ function setDimensions() {
     rows = cols;
     cellSize = Math.floor(canvas.width / cols);
     realExit = { x: cols - 1, y: rows - 1 };
+}
+
+function setFalseExits() {
     falseExits = [];
     // Add 2-3 false exits depending on level
     const numFalse = Math.min(3, Math.floor(level / 2) + 1);
@@ -168,6 +171,7 @@ document.getElementById('nextLevel').addEventListener('click', () => {
     document.getElementById('nextLevel').style.display = 'none';
     setDimensions();
     generateMaze();
+    setFalseExits();
     player = { x: 0, y: 0 };
     drawMaze();
 });
@@ -175,4 +179,5 @@ document.getElementById('nextLevel').addEventListener('click', () => {
 // Initial setup
 setDimensions();
 generateMaze();
+setFalseExits();
 drawMaze();
