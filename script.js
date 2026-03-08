@@ -1,15 +1,33 @@
-const canvas = document.getElementById('mazeCanvas');
-if (!canvas) {
-    document.body.innerHTML = '<h1>Canvas not found</h1><p>Unable to find the game canvas element.</p>';
-    return;
+let mazeContainer, cells;
+
+function initMazeDisplay() {
+    mazeContainer = document.getElementById('mazeContainer');
+    if (!mazeContainer) {
+        document.body.innerHTML = '<h1>Maze container not found</h1>';
+        return;
+    }
+    mazeContainer.innerHTML = '';
+    let table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.margin = '0 auto';
+    table.style.border = '2px solid #000';
+    cells = [];
+    for (let i = 0; i < rows; i++) {
+        let tr = document.createElement('tr');
+        cells[i] = [];
+        for (let j = 0; j < cols; j++) {
+            let td = document.createElement('td');
+            td.style.width = cellSize + 'px';
+            td.style.height = cellSize + 'px';
+            td.style.border = '1px solid #ccc';
+            td.style.backgroundColor = '#fff';
+            tr.appendChild(td);
+            cells[i][j] = td;
+        }
+        table.appendChild(tr);
+    }
+    mazeContainer.appendChild(table);
 }
-const ctx = canvas.getContext('2d');
-if (!ctx) {
-    document.body.innerHTML = '<h1>Canvas not supported</h1><p>Your browser does not support HTML5 Canvas. Please use a modern browser like Chrome, Firefox, or Edge.</p>';
-    return;
-}
-canvas.width = 400;
-canvas.height = 400;
 let level = 1;
 let maze = [];
 let player = { x: 0, y: 0 };
@@ -17,13 +35,15 @@ let realExit = { x: 0, y: 0 };
 let wolf = { x: 0, y: 0 };
 let carrots = [];
 let cols, rows, cellSize;
+let dragging = false;
 
 function setDimensions() {
     cols = 19 + level * 2; // start with 21x21, increase by 2 each level (even bigger mazes)
     rows = cols;
-    cellSize = Math.floor(canvas.width / cols);
+    cellSize = 20; // fixed cell size for table
     realExit = { x: Math.floor(cols / 2), y: Math.floor(rows / 2) }; // center of maze
     wolf = { x: cols - 1, y: rows - 1 }; // wolf starts at bottom-right
+    initMazeDisplay();
 }
 
 function setCarrots() {
@@ -78,9 +98,25 @@ function generateMaze() {
 }
 
 function drawMaze() {
-    if (!ctx) return;
-    ctx.fillStyle = 'red';
-    ctx.fillRect(0, 0, 400, 400);
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            if (maze[i][j] === 1) {
+                cells[i][j].style.backgroundColor = '#000';
+            } else {
+                cells[i][j].style.backgroundColor = '#fff';
+            }
+        }
+    }
+    // Draw exit (house)
+    cells[realExit.y][realExit.x].style.backgroundColor = 'green';
+    // Draw carrots
+    for (let c of carrots) {
+        cells[c.y][c.x].style.backgroundColor = 'orange';
+    }
+    // Draw player (rabbit)
+    cells[player.y][player.x].style.backgroundColor = 'red';
+    // Draw wolf
+    cells[wolf.y][wolf.x].style.backgroundColor = 'blue';
 }
 
 function checkWin() {
@@ -183,24 +219,14 @@ function moveWolf() {
     }
 }
 
-canvas.addEventListener('mousedown', (e) => {
+mazeContainer.addEventListener('mousedown', (e) => {
     dragging = true;
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / cellSize);
-    const y = Math.floor((e.clientY - rect.top) / cellSize);
-    if (canMoveTo(x, y)) {
-        player.x = x;
-        player.y = y;
-        drawMaze();
-        checkWin();
-    }
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    if (dragging) {
-        const rect = canvas.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left) / cellSize);
-        const y = Math.floor((e.clientY - rect.top) / cellSize);
+    if (e.target.tagName === 'TD') {
+        let td = e.target;
+        let tr = td.parentElement;
+        let table = mazeContainer.querySelector('table');
+        let y = Array.from(table.rows).indexOf(tr);
+        let x = Array.from(tr.cells).indexOf(td);
         if (canMoveTo(x, y)) {
             player.x = x;
             player.y = y;
@@ -210,28 +236,13 @@ canvas.addEventListener('mousemove', (e) => {
     }
 });
 
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    dragging = true;
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    const x = Math.floor((touch.clientX - rect.left) / cellSize);
-    const y = Math.floor((touch.clientY - rect.top) / cellSize);
-    if (canMoveTo(x, y)) {
-        player.x = x;
-        player.y = y;
-        drawMaze();
-        checkWin();
-    }
-});
-
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    if (dragging) {
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        const x = Math.floor((touch.clientX - rect.left) / cellSize);
-        const y = Math.floor((touch.clientY - rect.top) / cellSize);
+mazeContainer.addEventListener('mousemove', (e) => {
+    if (dragging && e.target.tagName === 'TD') {
+        let td = e.target;
+        let tr = td.parentElement;
+        let table = mazeContainer.querySelector('table');
+        let y = Array.from(table.rows).indexOf(tr);
+        let x = Array.from(tr.cells).indexOf(td);
         if (canMoveTo(x, y)) {
             player.x = x;
             player.y = y;
@@ -241,7 +252,46 @@ canvas.addEventListener('touchmove', (e) => {
     }
 });
 
-canvas.addEventListener('touchend', (e) => {
+mazeContainer.addEventListener('mouseup', () => {
+    dragging = false;
+});
+
+mazeContainer.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    dragging = true;
+    if (e.target.tagName === 'TD') {
+        let td = e.target;
+        let tr = td.parentElement;
+        let table = mazeContainer.querySelector('table');
+        let y = Array.from(table.rows).indexOf(tr);
+        let x = Array.from(tr.cells).indexOf(td);
+        if (canMoveTo(x, y)) {
+            player.x = x;
+            player.y = y;
+            drawMaze();
+            checkWin();
+        }
+    }
+});
+
+mazeContainer.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (dragging && e.target.tagName === 'TD') {
+        let td = e.target;
+        let tr = td.parentElement;
+        let table = mazeContainer.querySelector('table');
+        let y = Array.from(table.rows).indexOf(tr);
+        let x = Array.from(tr.cells).indexOf(td);
+        if (canMoveTo(x, y)) {
+            player.x = x;
+            player.y = y;
+            drawMaze();
+            checkWin();
+        }
+    }
+});
+
+mazeContainer.addEventListener('touchend', (e) => {
     e.preventDefault();
     dragging = false;
 });
