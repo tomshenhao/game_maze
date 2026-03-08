@@ -36,6 +36,7 @@ let wolf = { x: 0, y: 0 };
 let carrots = [];
 let cols, rows, cellSize;
 let dragging = false;
+let score = 0;
 
 function setDimensions() {
     cols = 19 + level * 2; // start with 21x21, increase by 2 each level (even bigger mazes)
@@ -129,8 +130,10 @@ function checkWin() {
         for (let i = carrots.length - 1; i >= 0; i--) {
             if (player.x === carrots[i].x && player.y === carrots[i].y) {
                 carrots.splice(i, 1); // remove carrot
+                score += 1; // add 1 point for carrot
+                document.getElementById('score').textContent = 'Score: ' + score;
                 wolf = { x: cols - 1, y: rows - 1 }; // reset wolf
-                document.getElementById('message').textContent = 'Yummy carrot! Wolf sent back!';
+                document.getElementById('message').textContent = 'Yummy carrot! Wolf sent back! +1 point';
                 setTimeout(() => {
                     document.getElementById('message').textContent = '';
                 }, 2000);
@@ -338,4 +341,5 @@ if (maze[realExit.y][realExit.x] === 1) {
         }
     setCarrots();
 drawMaze();
+document.getElementById('score').textContent = 'Score: ' + score;
 wolfInterval = setInterval(moveWolf, 750); // wolf moves every 0.75 seconds
