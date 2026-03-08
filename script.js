@@ -49,21 +49,27 @@ function generateMaze() {
 }
 
 function drawMaze() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Draw grass background
+    ctx.fillStyle = '#90EE90'; // light green
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Set font for emojis
+    ctx.font = `${cellSize * 0.8}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             if (maze[i][j] === 1) {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                // Draw tree wall
+                ctx.fillText('🌳', j * cellSize + cellSize / 2, i * cellSize + cellSize / 2);
             }
         }
     }
-    // Draw player
-    ctx.fillStyle = 'red';
-    ctx.fillRect(player.x * cellSize, player.y * cellSize, cellSize, cellSize);
-    // Draw exit
-    ctx.fillStyle = 'green';
-    ctx.fillRect(exit.x * cellSize, exit.y * cellSize, cellSize, cellSize);
+    // Draw exit (home)
+    ctx.fillText('🏠', exit.x * cellSize + cellSize / 2, exit.y * cellSize + cellSize / 2);
+    // Draw player (rabbit)
+    ctx.fillText('🐰', player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2);
 }
 
 let dragging = false;
@@ -99,7 +105,7 @@ canvas.addEventListener('mousedown', (e) => {
         player.y = y;
         drawMaze();
         if (player.x === exit.x && player.y === exit.y) {
-            document.getElementById('message').textContent = 'You win!';
+            document.getElementById('message').textContent = '🐰 Rabbit reached home! 🏠';
             document.getElementById('nextLevel').style.display = 'block';
         }
     }
@@ -115,7 +121,7 @@ canvas.addEventListener('mousemove', (e) => {
             player.y = y;
             drawMaze();
             if (player.x === exit.x && player.y === exit.y) {
-                document.getElementById('message').textContent = 'You win!';
+                document.getElementById('message').textContent = '🐰 Rabbit reached home! 🏠';
                 document.getElementById('nextLevel').style.display = 'block';
             }
         }
