@@ -8,7 +8,7 @@ let wolf = { x: 0, y: 0 };
 let cols, rows, cellSize;
 
 function setDimensions() {
-    cols = 13 + level * 2; // start with 15x15, increase by 2 each level (bigger and harder)
+    cols = 19 + level * 2; // start with 21x21, increase by 2 each level (even bigger mazes)
     rows = cols;
     cellSize = Math.floor(canvas.width / cols);
     realExit = { x: cols - 1, y: rows - 1 };
