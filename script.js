@@ -204,7 +204,7 @@ function getNextWolfMove() {
         for (let dir of directions) {
             const nx = current.x + dir.x;
             const ny = current.y + dir.y;
-            if (nx >= 0 && nx < cols && ny >= 0 && ny < rows && maze[ny][nx] === 0 && !visited.has(`${nx},${ny}`)) {
+            if (nx >= 0 && nx < cols && ny >= 0 && ny < rows && maze[ny][nx] === 0 && !visited.has(`${nx},${ny}`) && !(nx === player.x && ny === player.y)) {
                 visited.add(`${nx},${ny}`);
                 queue.push({ x: nx, y: ny, path: [...current.path, { x: nx, y: ny }] });
             }
@@ -250,7 +250,7 @@ setDimensions();
 generateMaze();
 if (maze[realExit.y][realExit.x] === 1) {
     maze[realExit.y][realExit.x] = 0;
-    // Connect to adjacent path
+    // Connect to adjacent path by finding a wall adjacent to a path
     const adj = [
         {x: realExit.x, y: realExit.y-1},
         {x: realExit.x+1, y: realExit.y},
@@ -265,10 +265,24 @@ if (maze[realExit.y][realExit.x] === 1) {
         }
     }
     if (!connected) {
+        // Find a wall adjacent that has a neighbor that is path
         for (let a of adj) {
-            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows) {
-                maze[a.y][a.x] = 0;
-                break;
+            if (a.x >= 0 && a.x < cols && a.y >= 0 && a.y < rows && maze[a.y][a.x] === 1) {
+                // Check if this wall has a neighbor that is path
+                const neighbors = [
+                    {x: a.x, y: a.y-1},
+                    {x: a.x+1, y: a.y},
+                    {x: a.x, y: a.y+1},
+                    {x: a.x-1, y: a.y}
+                ];
+                for (let n of neighbors) {
+                    if (n.x >= 0 && n.x < cols && n.y >= 0 && n.y < rows && maze[n.y][n.x] === 0) {
+                        maze[a.y][a.x] = 0;
+                        connected = true;
+                        break;
+                    }
+                }
+                if (connected) break;
             }
         }
     }
