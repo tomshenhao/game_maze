@@ -1,5 +1,7 @@
 const canvas = document.getElementById('mazeCanvas');
 const ctx = canvas.getContext('2d');
+canvas.width = 400;
+canvas.height = 400;
 let level = 1;
 let maze = [];
 let player = { x: 0, y: 0 };
@@ -69,22 +71,9 @@ function generateMaze() {
 
 function drawMaze() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            if (maze[i][j] === 1) {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
-            }
-        }
-    }
     // Draw exit (house)
     ctx.fillStyle = 'green';
     ctx.fillRect(realExit.x * cellSize, realExit.y * cellSize, cellSize, cellSize);
-    // Draw carrots
-    ctx.fillStyle = 'orange';
-    for (let c of carrots) {
-        ctx.fillRect(c.x * cellSize, c.y * cellSize, cellSize, cellSize);
-    }
     // Draw player (rabbit)
     ctx.fillStyle = 'red';
     ctx.fillRect(player.x * cellSize, player.y * cellSize, cellSize, cellSize);
